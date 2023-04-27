@@ -1,7 +1,7 @@
-name: llama-sexism
+name: llama-sexism-gpu
 channels:
-  - huggingface
   - pytorch
+  - huggingface
   - conda-forge
   - defaults
 dependencies:
@@ -14,13 +14,13 @@ dependencies:
   - brotli-bin=1.0.9=h7f98852_5
   - brotlipy=0.7.0=py39h27cfd23_1003
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2022.2.1=h06a4308_0
+  - ca-certificates=2022.3.18=h06a4308_0
   - certifi=2021.10.8=py39h06a4308_2
   - cffi=1.15.0=py39hd667e15_1
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
   - click=8.0.4=py39h06a4308_0
-  - cpuonly=2.0=0
   - cryptography=36.0.0=py39h9ce1e76_0
+  - cudatoolkit=11.3.1=h2bc3f7f_2
   - cycler=0.11.0=pyhd8ed1ab_0
   - dataclasses=0.8=pyh6d0b6a4_7
   - dbus=1.13.6=he372182_0
@@ -87,7 +87,7 @@ dependencies:
   - numpy=1.21.2=py39h20f2e39_0
   - numpy-base=1.21.2=py39h79a1101_0
   - openh264=2.1.1=h4ff587b_0
-  - openssl=1.1.1m=h7f8727e_0
+  - openssl=1.1.1n=h7f8727e_0
   - packaging=21.3=pyhd3eb1b0_0
   - pandas=1.4.1=py39h295c915_0
   - pcre=8.45=h9c3ff4c_0
@@ -103,8 +103,8 @@ dependencies:
   - python=3.9.7=h12debd9_1
   - python-dateutil=2.8.2=pyhd3eb1b0_0
   - python_abi=3.9=2_cp39
-  - pytorch=1.10.2=py3.9_cpu_0
-  - pytorch-mutex=1.0=cpu
+  - pytorch=1.11.0=py3.9_cuda11.3_cudnn8.2.0_0
+  - pytorch-mutex=1.0=cuda
   - pytz=2021.3=pyhd3eb1b0_0
   - pyyaml=6.0=py39h7f8727e_1
   - qt=5.9.7=h5867ecd_1
@@ -114,16 +114,18 @@ dependencies:
   - sacremoses=master=py_0
   - scikit-learn=1.0.2=py39h51133e4_1
   - scipy=1.7.3=py39hc147768_0
+  - sentencepiece=0.1.95=py39hd09550d_0
   - setuptools=58.0.4=py39h06a4308_0
   - sip=4.19.13=py39h295c915_0
   - six=1.16.0=pyhd3eb1b0_1
   - soupsieve=2.3.1=pyhd8ed1ab_0
   - sqlite=3.37.2=hc218d9a_0
+  - tabulate=0.8.9=py39h06a4308_0
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.11=h1ccaba5_0
   - tokenizers=0.10.3=py39hb317417_1
-  - torchaudio=0.10.2=py39_cpu
-  - torchvision=0.11.3=py39_cpu
+  - torchaudio=0.11.0=py39_cu113
+  - torchvision=0.12.0=py39_cu113
   - tornado=6.1=py39h3811e60_1
   - tqdm=4.62.3=pyhd3eb1b0_1
   - transformers=4.11.3=py_0
@@ -140,4 +142,4 @@ dependencies:
   - zipp=3.7.0=pyhd3eb1b0_0
   - zlib=1.2.11=h7f8727e_4
   - zstd=1.4.9=haebb681_0
-prefix: /home/adepau/anaconda3/envs/llama-sexism
+prefix: /home/adepau/anaconda3/envs/llama-sexism-gpu
