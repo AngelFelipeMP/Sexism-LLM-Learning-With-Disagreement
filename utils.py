@@ -12,7 +12,7 @@ def download_exist_package(package_path, url):
     os.makedirs(package_path)
     
     #download the exist package zip file
-    output = config.PACKAGE_PATH.split('/')[-1] + '.zip'
+    output = package_path.split('/')[-1] + '.zip'
     gdown.download(url=url, output=output, quiet=False, fuzzy=True)
     
     # loading the temp.zip and creating a zip object
@@ -21,13 +21,27 @@ def download_exist_package(package_path, url):
         
         # Extracting all the members of the zip 
         # into a specific location.
-        zObject.extractall(config.PACKAGE_PATH)
+        zObject.extractall(package_path)
 
 
-def merge_data_labels():
-    
-    
+def merge_data_labels(package_path, label_gold_path, data_path, dataset):
+
+    # dataset dev/traninig
+    for partition in ['dev', 'training']:
+        path_partition = package_path + '/' + partition + '/EXIST2023_' + partition + '.json'
+        df_partition = pd.read_json(path_partition, orient='index')
         
+        # Task 1/2/3
+        for task in ['task1', 'task2', 'task3']:
+            path_label = label_gold_path + '/' + dataset + '_' + partition + '_' + task + '_gold_soft.json'
+            df_label = pd.read_json(path_label, orient='index')
+            
+            df_partition = pd.concat([df_partition, df_label], axis=1)
+            
+        path_csv = data_path + '/' + dataset + '_' + partition + '.csv'
+        df_partition.to_csv(path_csv, index=False)
+    
+
 
 def process_EXIST2022_data(data_path, labels_col, index_col):
     files = [f for f in os.listdir(data_path) if 'processed' not in f]
