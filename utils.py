@@ -23,10 +23,8 @@ def download_exist_package(package_path, url):
         # into a specific location.
         zObject.extractall(package_path)
 
-
 def merge_data_labels(package_path, label_gold_path, data_path, dataset):
-
-    # dataset dev/traninig
+    # partition dev/traninig
     for partition in ['dev', 'training']:
         path_partition = package_path + '/' + partition + '/EXIST2023_' + partition + '.json'
         df_partition = pd.read_json(path_partition, orient='index')
@@ -41,7 +39,32 @@ def merge_data_labels(package_path, label_gold_path, data_path, dataset):
         path_csv = data_path + '/' + dataset + '_' + partition + '.csv'
         df_partition.to_csv(path_csv, index=False)
     
-
+def test_to_csv(package_path, data_path, dataset):
+        partition = 'test'
+        path = package_path + '/' + partition + '/EXIST2023_' + partition + '_clean' + '.json'
+        df_partition = pd.read_json(path, orient='index')
+        
+        path_csv = data_path + '/' + dataset + '_' + partition + '.csv'
+        df_partition.to_csv(path_csv, index=False)
+    
+    
+def merge_training_dev(data_path, dataset):
+    partition_list =[]
+    partition_strings_list = [] 
+    # partition dev/traninig
+    for partition in ['training', 'dev']:
+        path_partition = data_path + '/' + dataset + '_' + partition + '.csv'
+        df_partition = pd.read_csv(path_partition)
+        partition_list.append(df_partition)
+        partition_strings_list.append(partition)
+            
+    df_partition = pd.concat(partition_list)
+            
+    path_csv = data_path + '/' + dataset + '_' + '-'.join(partition_strings_list) + '.csv'
+    df_partition.to_csv(path_csv, index=False)
+    
+    
+    
 
 def process_EXIST2022_data(data_path, labels_col, index_col):
     files = [f for f in os.listdir(data_path) if 'processed' not in f]
