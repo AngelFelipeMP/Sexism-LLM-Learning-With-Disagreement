@@ -29,9 +29,9 @@ class TransformerDataset:
         )
         
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
-        inputs['targets'] = torch.tensor(self.target[item], dtype=torch.long)
-        #TODO: Convert string to dict/list and than to torch.long tensor
-        
+        #[x]: Convert string to dict/list and than to torch.long tensor
+        # inputs['targets'] = torch.tensor(self.target[item], dtype=torch.long)
+        inputs['targets'] = {k:torch.tensor(v, dtype=torch.long) for k,v in eval(self.target[item]).items()}
         return inputs
     
     

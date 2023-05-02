@@ -39,7 +39,7 @@ def merge_data_labels(package_path, label_gold_path, data_path, dataset):
         for task in ['task1', 'task2', 'task3']:
             path_label = label_gold_path + '/' + dataset + '_' + partition + '_' + task + '_gold_soft.json'
             df_label = pd.read_json(path_label, orient='index')
-            df_label.rename(columns={"soft_label": task + '_' + 'soft_label'})
+            df_label.rename(columns={"soft_label": 'soft_label' + '_' + task }, inplace=True)
             
             df_partition = pd.concat([df_partition, df_label], axis=1)
             
