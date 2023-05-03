@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
+from utils import transformation
 
 class TransformerDataset:
     def __init__(self, text, target, max_len, transformer):
@@ -29,11 +30,12 @@ class TransformerDataset:
         )
         
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
-        #[x]: Convert string to dict/list and than to torch.long tensor
         # inputs['targets'] = torch.tensor(self.target[item], dtype=torch.long)
-        inputs['targets'] = {k:torch.tensor(v, dtype=torch.long) for k,v in eval(self.target[item]).items()}
+        _, targets = transformation(self.target[item])
+        inputs['targets'] = torch.tensor(targets, dtype=torch.float).view(1,-1)
+        
         return inputs
-    
+        
     
 class TransformerDataset_Test:
     def __init__(self, text, max_len, transformer):
