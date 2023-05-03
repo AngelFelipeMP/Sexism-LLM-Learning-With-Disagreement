@@ -72,6 +72,12 @@ def merge_training_dev(data_path, dataset):
     df_partition.to_csv(path_csv, index=False)
 
 
+def transformation(item):
+    # dict to list ordered by keys
+    classes = [i[0] for i in sorted(eval(item).items())]
+    values = [i[1] for i in sorted(eval(item).items())]
+    return classes, values
+
 #######################
 ### below old funcs ###
 #######################
