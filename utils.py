@@ -4,6 +4,8 @@ import pandas as pd
 import gdown
 import config
 from zipfile import ZipFile
+import json
+from exist2023evaluation import main
 
 def download_exist_package(package_path, url):
     #create a data folder
@@ -74,9 +76,50 @@ def merge_training_dev(data_path, dataset):
 
 def transformation(item):
     # dict to list ordered by keys
-    classes = [i[0] for i in sorted(eval(item).items())]
-    values = [i[1] for i in sorted(eval(item).items())]
+    if len(eval(item)) == 2:
+        classes = [i[0] for i in sorted(eval(item).items())]
+        values = [i[1] for i in sorted(eval(item).items())]
+    else:
+        classes = [i[0] for i in sorted(eval(item).items()) if i[0] != 'NO']
+        values = [i[1] for i in sorted(eval(item).items()) if i[0] != 'NO']
     return classes, values
+
+
+def save_preds(preds, df, task, data_train, data_val, epoch, transformer):
+    index_label = [(index, eval(labels)) for index, labels in zip(df['id_EXIST'], df['soft_label_' + task])]
+    classes, _ = transformation(str(index_label[0][1]))
+    json_pred = {item[0]:{"soft_label":{}} for item in index_label}
+
+    for i in range(len(index_label)):
+        # for task 1
+        if 'NO' not in index_label[0][1].keys():
+            # add 'NO' value to json
+            json_pred[index_label[i][0]]["soft_label"]['NO'] = index_label[i][1]['NO']
+        # add other classes values to json
+        for c in classes:
+            json_pred[index_label[i][0]]["soft_label"][c] = preds[i][c]
+            
+    # Save the dictionary as a JSON file
+    path = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
+    with open(path, "w") as f:
+        json.dump(json_pred, f)
+
+
+def eval_preds(task, data_train, data_val, epoch, transformer):
+    path_json_results = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
+    
+    if data_val == 'dev':
+        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_val + '_' + task + '_task1_gold_soft.json'
+    else:
+        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_train + '_' + task + '_task1_gold_soft.json'
+        
+    result_icm_soft_soft = main(['-p', path_json_results, '-g', path_gold_file, '-t', task])
+    
+    return result_icm_soft_soft 
+        
+    def Merge_gold_soft_label(df):
+        #TODO: merge gold and soft label
+        pass
 
 #######################
 ### below old funcs ###
