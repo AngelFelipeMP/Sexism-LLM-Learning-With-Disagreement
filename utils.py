@@ -74,6 +74,22 @@ def merge_training_dev(data_path, dataset):
     df_partition.to_csv(path_csv, index=False)
 
 
+def merge_gold_soft_label(label_gold_path, dataset):
+    for task in ['task1', 'task2', 'task3']:
+        json_list = []
+        for partition in ['training','dev']:
+            
+            path_label = label_gold_path + '/' + dataset + '_' + partition + '_' + task + '_gold_soft.json'
+            with open(path_label, 'r') as file:
+                data = json.load(file)
+            json_list.append(data)
+
+        path_merge = label_gold_path + '/' + dataset + '_' + 'training-dev' + '_' + task + '_gold_soft.json'
+        json_list[0].update(json_list[1])
+        with open(path_merge, 'w') as merged_file:
+            json.dump(json_list[0], merged_file, indent=2)
+
+
 def transformation(item):
     # dict to list ordered by keys
     if len(eval(item)) == 2:
@@ -117,21 +133,8 @@ def eval_preds(task, data_train, data_val, epoch, transformer):
     
     return result_icm_soft_soft 
     
-#TODO: merge gold and soft label
-def merge_gold_soft_label(label_gold_path, dataset):
-    for task in ['task1', 'task2', 'task3']:
-        json_list = []
-        for partition in ['training','dev']:
-            
-            path_label = label_gold_path + '/' + dataset + '_' + partition + '_' + task + '_gold_soft.json'
-            with open(path_label, 'r') as file:
-                data = json.load(file)
-            json_list.append(data)
 
-        path_merge = label_gold_path + '/' + dataset + '_' + 'training-dev' + '_' + task + '_gold_soft.json'
-        json_list[0].update(json_list[1])
-        with open(path_merge, 'w') as merged_file:
-            json.dump(json_list[0], merged_file, indent=2)
+
 
 #######################
 ### below old funcs ###

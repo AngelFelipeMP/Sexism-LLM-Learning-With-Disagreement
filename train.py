@@ -22,8 +22,8 @@ logging.set_verbosity_error()
 def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, drop_out, df_results, training_data):
     
     train_dataset = dataset.TransformerDataset(
-        text=df_train[config.DATASET_TEXT].values,
-        target=df_train[task].values,
+        text=df_train[config.COLUMN_TEXT].values,
+        target=df_train[config.COLUMN_LABELS + task].values,
         max_len=max_len,
         transformer=transformer
     )
@@ -35,8 +35,8 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
     )
     
     val_dataset = dataset.TransformerDataset(
-        text=df_val[config.DATASET_TEXT].values,
-        target=df_val[task].values,
+        text=df_val[config.COLUMN_TEXT].values,
+        target=df_val[config.COLUMN_LABELS + task].values,
         max_len=max_len,
         transformer=transformer
     )
@@ -49,7 +49,7 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
 
     #COMMENT: I may make the number_of_classes simpler
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = TransforomerModel(transformer, drop_out, number_of_classes=max(list(config.DATASET_CLASSES[task].values()))+1)
+    model = TransforomerModel(transformer, drop_out, number_of_classes=config.UNITS[task]) 
     model.to(device)
     
     #NOTE: I must check appropriate no_decay for LLaMA
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         exit(1)
     
     else:
-        print('Specifying --training_data training or training-dev')
+        print('Specifying --training_data training OR training-dev')
         exit(1)
 
     random.seed(config.SEED)

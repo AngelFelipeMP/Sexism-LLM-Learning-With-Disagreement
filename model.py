@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoModel, AutoConfig
+import config
 
 class TransforomerModel(nn.Module):
     def __init__(self, transformer, drop_out, number_of_classes):
@@ -20,12 +21,12 @@ class TransforomerModel(nn.Module):
         drop = self.dropout(cat)
         output = self.classifier(drop)
         
-        # it means task 3 -> Multi-label classification
-        if iputs['targets'].shape[1] > 3:
+        # it means is not task 3 -> Multi-label classification
+        if self.number_of_classes != config.UNITS['task3']:
             output = self.softmax(output)
 
         return output
     
-    #COMMENT: check if the best way to generate LLM final vector is to average the last hidden state
-    #COMMENT: how to have different learning rate for the LLM and for the classifier 
-    #COMMENT: I guess I will have to brack the model into two pieces
+    #NOTE: check if the best way to generate LLM final vector is to average the last hidden state
+    #NOTE: how to have different learning rate for the LLM and for the classifier 
+    #NOTE: I guess I will have to brack the model into two pieces

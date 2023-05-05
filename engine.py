@@ -60,7 +60,23 @@ def eval_fn(data_loader, model, device):
     return fin_predictions, fin_targets, total_loss/len(data_loader)
 
 
+def test_fn(data_loader, model, device):
+    model.eval()
+    fin_predictions = []
 
+    with torch.no_grad():
+        for batch in data_loader:
+            
+            # batch = {k:v.to(device, dtype=torch.long) for k,v in batch.items()}
+            batch = {k:v.to(device) for k,v in batch.items()}
+            outputs = model(batch)
+            
+            fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
+    
+    return fin_predictions
+
+
+#NOTE: I may remove "predict_fn"
 def predict_fn(data_loader, model, device):
     model.eval()
     fin_targets = []
@@ -80,20 +96,3 @@ def predict_fn(data_loader, model, device):
             fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
     
     return fin_predictions, fin_targets
-
-
-
-def test_fn(data_loader, model, device):
-    model.eval()
-    fin_predictions = []
-
-    with torch.no_grad():
-        for batch in data_loader:
-            
-            # batch = {k:v.to(device, dtype=torch.long) for k,v in batch.items()}
-            batch = {k:v.to(device) for k,v in batch.items()}
-            outputs = model(batch)
-            
-            fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
-    
-    return fin_predictions
