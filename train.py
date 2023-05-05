@@ -1,4 +1,3 @@
-import os
 import dataset
 import engine
 import torch
@@ -8,7 +7,7 @@ import random
 import config
 from tqdm import tqdm
 import argparse
-from utils import transformation, save_preds, eval_preds
+from utils import save_preds, eval_preds
 
 from model import TransforomerModel
 import warnings
@@ -20,12 +19,10 @@ from transformers import logging
 logging.set_verbosity_error()
 
 
-def train(df_train, df_val, task, epochs, best_epoch, transformer, max_len, batch_size, lr, drop_out, df_results, data):
-# def train(df_train, task, epochs, best_epoch, transformer, max_len, batch_size, lr, drop_out, language, df_results, data):
+def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, drop_out, df_results, training_data):
     
     train_dataset = dataset.TransformerDataset(
-        # text=df_train[language].values,
-        text=df_train['tweet'].values,
+        text=df_train[config.DATASET_TEXT].values,
         target=df_train[task].values,
         max_len=max_len,
         transformer=transformer
@@ -38,7 +35,7 @@ def train(df_train, df_val, task, epochs, best_epoch, transformer, max_len, batc
     )
     
     val_dataset = dataset.TransformerDataset(
-        text=df_val['tweet'].values,
+        text=df_val[config.DATASET_TEXT].values,
         target=df_val[task].values,
         max_len=max_len,
         transformer=transformer
@@ -50,6 +47,7 @@ def train(df_train, df_val, task, epochs, best_epoch, transformer, max_len, batc
         num_workers=config.VAL_WORKERS
     )
 
+    #COMMENT: I may make the number_of_classes simpler
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = TransforomerModel(transformer, drop_out, number_of_classes=max(list(config.DATASET_CLASSES[task].values()))+1)
     model.to(device)
@@ -69,15 +67,16 @@ def train(df_train, df_val, task, epochs, best_epoch, transformer, max_len, batc
         optimizer, num_warmup_steps=0, num_training_steps=num_train_steps
     )
     
-    for epoch in range(1, best_epoch+1):
+    # training and evaluation loop
+    for epoch in range(1, epochs+1):
         
         pred_train, _ , loss_train = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
-        save_preds(pred_train, df_train, task, data, 'training', epoch, transformer)
-        icm_soft_train = eval_preds(task, data, 'training', epoch, transformer)
+        save_preds(pred_train, df_train, task, training_data, 'training', epoch, transformer)
+        icm_soft_train = eval_preds(task, training_data, 'training', epoch, transformer)
         
         pred_val, _ , loss_val = engine.eval_fn(val_data_loader, model, device)
-        save_preds(pred_val, df_val, task, data, 'dev', epoch, transformer)
-        icm_soft_val = eval_preds(task, data, 'dev', epoch, transformer)
+        save_preds(pred_val, df_val, task, training_data, 'dev', epoch, transformer)
+        icm_soft_val = eval_preds(task, training_data, 'dev', epoch, transformer)
         
         df_new_results = pd.DataFrame({'task':task,
                             'epoch':epoch,
@@ -97,47 +96,47 @@ def train(df_train, df_val, task, epochs, best_epoch, transformer, max_len, batc
         
         tqdm.write("Epoch {}/{} ICM-soft_training = {:.3f} loss_training = {:.3f} ICM-soft_val = {:.3f}  loss_val = {:.3f}".format(epoch, config.EPOCHS, icm_soft_train, loss_train, icm_soft_val, loss_val))
 
-    # add "language" as input
-    path_model = config.LOGS_PATH + '/model' + '_' + task + '_' + data + '_' + transformer.split("/")[-1] + '.pt'
-    torch.save(model.state_dict(), path_model)
+    # save models weights
+    path_model_save = config.LOGS_PATH + '/model' + '_' + task + '_' + training_data + '_' + transformer.split("/")[-1] + '.pt'
+    if training_data == 'training-dev' and  epoch == epochs:
+        torch.save(model.state_dict(), path_model_save)
+    else:
+        if epoch == 1 or icm_soft_val > df_results['icm_soft_val'][:-1].max():
+            torch.save(model.state_dict(), path_model_save)
 
     return df_results
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, help='Data/Datasets to train the models')
+    parser.add_argument('--training_data', type=str, help='Datasets to train the models')
     args = parser.parse_args()
     
-    if args.data == 'training':
+    if args.training_data == 'training':
         datasets = config.DATASET_TRAIN
-        domain = config.DOMAIN_TRAIN
-    
-    elif args.data == 'training-dev':
+        
+    elif args.training_data == 'training-dev':
         datasets = config.DATASET_TRAIN_DEV
-        domain = config.DOMAIN_TRAIN_DEV
     
-    elif not args.data:
-        print('Specifying --data is required')
+    elif not args.training_data:
+        print('Specifying --training_data is required')
         exit(1)
     
     else:
-        print('Specifying --data training or training-dev')
+        print('Specifying --training_data training or training-dev')
         exit(1)
-        
-    
+
     random.seed(config.SEED)
     np.random.seed(config.SEED)
     torch.manual_seed(config.SEED)
     torch.cuda.manual_seed_all(config.SEED)
+
+    df_train = pd.read_csv(config.DATA_PATH + '/' + datasets, index_col=None).iloc[:config.N_ROWS]
+    df_train['NO_value'] = df_train['soft_label_task1'].apply(lambda x: x['NO']) 
     
-    df = pd.read_csv(config.DATA_PATH + '/' + datasets, index_col=None)
-    
-    #TODO: I have already joing it, chnage things here
-    #TODO: dfx should be df
-    # dfx = pd.concat(dataset_list, axis=0, ignore_index=True).iloc[:config.N_ROWS]
-    print('Dataset shape: ', dfx.shape)
-    
+    df_val = pd.read_csv(config.DATA_PATH + '/' + config.DATASET_DEV, index_col=None).iloc[:config.N_ROWS]
+    df_val['NO_value'] = df_val['soft_label_task1'].apply(lambda x: x['NO']) 
+
     df_results = pd.DataFrame(columns=['task',
                                     'epoch',
                                     'transformer',
@@ -153,11 +152,10 @@ if __name__ == "__main__":
     )
     
     for task in tqdm(config.LABELS, desc='TRAIN', position=0):
-        #TODO: There will be no dfx anymre 
-        df_train = dfx.loc[dfx[task]>=0]
+        df_train = df_train[(df_train['NO_value']<=0.5) | (task == 'task1')]
+        df_val = df_val[(df_val['NO_value']<=0.5) | (task == 'task1')]
         
-        #TODO: Load df_val
-        tqdm.write(f'\nTask: {task} Data: {domain} Transfomer: {config.TRANSFORMERS.split("/")[-1]} Max_len: {config.MAX_LEN} Batch_size: {config.BATCH_SIZE} Dropout: {config.DROPOUT} lr: {config.LR}')
+        tqdm.write(f'\nTask: {task} Data: {args.training_data} Transfomer: {config.TRANSFORMERS.split("/")[-1]} Max_len: {config.MAX_LEN} Batch_size: {config.BATCH_SIZE} Dropout: {config.DROPOUT} lr: {config.LR}')
             
         df_results = train(df_train,
                             df_val,
@@ -169,12 +167,7 @@ if __name__ == "__main__":
                             config.LR,
                             config.DROPOUT,
                             df_results,
-                            args.data
-                            #domain
+                            args.training_data
         )
             
-        df_results.to_csv(config.LOGS_PATH + '/' + domain + '.csv', index=False)
-        
-        
-        
-        #TODO: REVIEL ALL THIS SCRIPT AGAIN
+        df_results.to_csv(config.LOGS_PATH + '/' + args.training_data + '.csv', index=False)
