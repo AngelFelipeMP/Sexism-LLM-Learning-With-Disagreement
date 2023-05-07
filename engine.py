@@ -1,9 +1,12 @@
 import torch
 import torch.nn as nn
-
+import config
 
 def loss_fn(outputs, targets):
-    return nn.CrossEntropyLoss()(outputs, targets)
+    if targets.shape[1] == config.UNITS['task3']:
+        return nn.BCELoss()(outputs, targets)
+    else:
+        return nn.CrossEntropyLoss()(outputs, targets)
 
 def train_fn(data_loader, model, optimizer, device, scheduler):
     model.train()
