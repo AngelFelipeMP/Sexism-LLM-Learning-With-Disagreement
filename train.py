@@ -96,13 +96,13 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
         
         tqdm.write("Epoch {}/{} ICM-soft_training = {:.3f} loss_training = {:.3f} ICM-soft_val = {:.3f}  loss_val = {:.3f}".format(epoch, config.EPOCHS, icm_soft_train, loss_train, icm_soft_val, loss_val))
 
-    # save models weights
-    path_model_save = config.LOGS_PATH + '/model' + '_' + task + '_' + training_data + '_' + transformer.split("/")[-1] + '.pt'
-    if training_data == 'training-dev' and  epoch == epochs:
-        torch.save(model.state_dict(), path_model_save)
-    else:
-        if epoch == 1 or icm_soft_val > df_results['icm_soft_val'][:-1].max():
+        # save models weights
+        path_model_save = config.LOGS_PATH + '/model' + '_' + task + '_' + training_data + '_' + transformer.split("/")[-1] + '.pt'
+        if training_data == 'training-dev' and  epoch == epochs:
             torch.save(model.state_dict(), path_model_save)
+        else:
+            if epoch == 1 or icm_soft_val > df_results['icm_soft_val'][:-1].max():
+                torch.save(model.state_dict(), path_model_save)
 
     return df_results
 
@@ -132,10 +132,10 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(config.SEED)
 
     df_train = pd.read_csv(config.DATA_PATH + '/' + datasets, index_col=None).iloc[:config.N_ROWS]
-    df_train['NO_value'] = df_train['soft_label_task1'].apply(lambda x: x['NO']) 
+    df_train['NO_value'] = df_train['soft_label_task1'].apply(lambda x: eval(x)['NO'])
     
     df_val = pd.read_csv(config.DATA_PATH + '/' + config.DATASET_DEV, index_col=None).iloc[:config.N_ROWS]
-    df_val['NO_value'] = df_val['soft_label_task1'].apply(lambda x: x['NO']) 
+    df_val['NO_value'] = df_val['soft_label_task1'].apply(lambda x: eval(x)['NO']) 
 
     df_results = pd.DataFrame(columns=['task',
                                     'epoch',
@@ -170,4 +170,4 @@ if __name__ == "__main__":
                             args.training_data
         )
             
-        df_results.to_csv(config.LOGS_PATH + '/' + args.training_data + '.csv', index=False)
+        df_results.to_csv(config.LOGS_PATH + '/' + args.training_data + '_' + task + '.csv', index=False)

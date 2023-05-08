@@ -717,8 +717,8 @@ class EXIST_2023_evaluation (object):
                 results = fmeasure.evaluate()
                 for r in results:
                     print("TASK 1 - Result FMeasure evaluation hard-hard for class:", r, "=\t", results[r])
-            else:
-                print("Not valid format for hard-hard evaluation")
+            # else:
+                # print("Not valid format for hard-hard evaluation") ##### ANGEL ADD ####
             
             #hard vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_hard_soft()
@@ -726,17 +726,17 @@ class EXIST_2023_evaluation (object):
                 icm_soft = ICM_Soft(pred_df, gold_df, MONO_LABEL_TASK, self.TASK_1_HIERARCHY)
                 result_icm_hard_soft=icm_soft.evaluate()
                 print("TASK 1 - Result ICM evaluation hard-soft:\t", result_icm_hard_soft)
-            else:
-                print("Not valid format for hard-soft evaluation")    
+            # else:
+                # print("Not valid format for hard-soft evaluation")  ##### ANGEL ADD ####
                 
             #soft vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_soft_soft()
             if succes: 
                 icm_soft = ICM_Soft(pred_df, gold_df, MONO_LABEL_TASK, self.TASK_1_HIERARCHY)
-                result_icm_soft_soft=icm_soft.evaluate()
-                print("TASK 1 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft)
+                result_icm_soft_soft=icm_soft.evaluate() ##### ANGEL ADD ####
+                # print("TASK 1 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft) ##### ANGEL ADD ####
             else:
-                print("Not valid format for soft-soft evaluation")                             
+                print("Not valid format for soft-soft evaluation")                            
                 
             
         if self.task==self.TASK2_TAG:
@@ -751,8 +751,8 @@ class EXIST_2023_evaluation (object):
                 results = fmeasure.evaluate()
                 for r in results:
                     print("TASK 2 - Result FMeasure evaluation hard-hard for class: ", r, "=\t", results[r])                
-            else:
-                print("Not valid format for hard-hard evaluation")            
+            # else:
+                # print("Not valid format for hard-hard evaluation")   ##### ANGEL ADD ####
             
             #hard vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_hard_soft()
@@ -760,15 +760,15 @@ class EXIST_2023_evaluation (object):
                 icm_soft = ICM_Soft(pred_df, gold_df, MONO_LABEL_TASK, self.TASK_2_HIERARCHY)
                 result_icm_hard_soft=icm_soft.evaluate()
                 print("TASK 2 - Result ICM evaluation hard-soft:\t", result_icm_hard_soft)
-            else:
-                print("Not valid format for hard-soft evaluation")    
+            # else:
+                # print("Not valid format for hard-soft evaluation")   ##### ANGEL ADD ####
                 
             #soft vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_soft_soft()
             if succes: 
                 icm_soft = ICM_Soft(pred_df, gold_df, MONO_LABEL_TASK, self.TASK_2_HIERARCHY)
-                result_icm_soft_soft=icm_soft.evaluate()
-                print("TASK 2 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft)
+                result_icm_soft_soft=icm_soft.evaluate() ##### ANGEL ADD ####
+                # print("TASK 2 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft) ##### ANGEL ADD ####
             else:
                 print("Not valid format for soft-soft evaluation")                           
             
@@ -785,8 +785,8 @@ class EXIST_2023_evaluation (object):
                 results = fmeasure.evaluate()
                 for r in results:
                     print("TASK 3 - Result FMeasure evaluation hard-hard for class: ", r, "=\t", results[r])                
-            else:
-                print("Not valid format for hard-hard evaluation")              
+            # else:
+                # print("Not valid format for hard-hard evaluation")     ##### ANGEL ADD ####
             
             #hard vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_hard_soft()
@@ -794,19 +794,19 @@ class EXIST_2023_evaluation (object):
                 icm_soft = ICM_Soft(pred_df, gold_df, MULTI_LABEL_TASK, self.TASK_3_HIERARCHY)
                 result_icm_hard_soft=icm_soft.evaluate()
                 print("TASK 3 - Result ICM evaluation hard-soft:\t", result_icm_hard_soft)
-            else:
-                print("Not valid format for hard-soft evaluation")    
+            # else:
+                # print("Not valid format for hard-soft evaluation")    ##### ANGEL ADD ####
                 
             #soft vs soft evaluation
             succes, pred_df,gold_df= self.prepare_data_soft_soft()
             if succes: 
                 icm_soft = ICM_Soft(pred_df, gold_df, MULTI_LABEL_TASK, self.TASK_3_HIERARCHY)
-                result_icm_soft_soft=icm_soft.evaluate()
-                print("TASK 3 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft)
+                result_icm_soft_soft=icm_soft.evaluate() ##### ANGEL ADD ####
+                # print("TASK 3 - Result ICM evaluation soft-soft:\t", result_icm_soft_soft) ##### ANGEL ADD ####
             else:
                 print("Not valid format for soft-soft evaluation")
                 
-            ##### ANGEL ADD ####
+        ##### ANGEL ADD ####
         return result_icm_soft_soft
             
                         
@@ -935,11 +935,12 @@ def main(argv):
         elif opt in ("-e", "--efile"):
             gold_file_hard = arg.strip() 
         elif opt in ("-t", "--task"):
-            task = arg.strip()                     
-    print ('Prediction file is ', pred_file)
-    print ('Gold file is ', gold_file)
-    print ('Gold file hard is ', gold_file_hard)
-    print ('Task for evaluation is ', task)
+            task = arg.strip()
+    ##### ANGEL ADD ####
+    # print ('Prediction file is ', pred_file)
+    # print ('Gold file is ', gold_file)
+    # print ('Gold file hard is ', gold_file_hard)
+    # print ('Task for evaluation is ', task)
     
     #check if the files exists
     if not check_file_exist(pred_file):
@@ -954,7 +955,9 @@ def main(argv):
             return
     
     exist2023_evaluation = EXIST_2023_evaluation(pred_file, gold_file, gold_file_hard, task)
-    exist2023_evaluation.evaluate()
+    result_icm_soft_soft = exist2023_evaluation.evaluate() ##### ANGEL ADD ####
+    
+    return float(result_icm_soft_soft) ##### ANGEL ADD ####
     
 def check_file_exist(path_file):
     path = p.Path(path_file)
@@ -965,10 +968,9 @@ def check_file_exist(path_file):
             return False                
     else:
         return False
-           
         
 if __name__ == '__main__':  
     args = sys.argv[1:]
-    _ = main(args)
+    _ = main(args) ##### ANGEL ADD ####
     
 

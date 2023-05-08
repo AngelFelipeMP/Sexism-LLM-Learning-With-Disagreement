@@ -112,22 +112,22 @@ def save_preds(preds, df, task, data_train, data_val, epoch, transformer):
             # add 'NO' value to json
             json_pred[index_label[i][0]]["soft_label"]['NO'] = index_label[i][1]['NO']
         # add other classes values to json
-        for c in classes:
-            json_pred[index_label[i][0]]["soft_label"][c] = preds[i][c]
+        for j, c in enumerate(classes):
+            json_pred[index_label[i][0]]["soft_label"][c] = preds[i][j]
             
     # Save the dictionary as a JSON file
     path = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
     with open(path, "w") as f:
-        json.dump(json_pred, f)
+        json.dump(json_pred, f, indent=2)
 
 
 def eval_preds(task, data_train, data_val, epoch, transformer):
     path_json_results = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
     
     if data_val == 'dev':
-        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_val + '_' + task + '_task1_gold_soft.json'
+        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_val + '_' + task + '_gold_soft.json'
     else:
-        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_train + '_' + task + '_task1_gold_soft.json'
+        path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_train + '_' + task + '_gold_soft.json'
         
     result_icm_soft_soft = main(['-p', path_json_results, '-g', path_gold_file, '-t', task])
     

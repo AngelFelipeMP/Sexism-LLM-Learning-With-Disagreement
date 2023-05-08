@@ -32,7 +32,8 @@ class TransformerDataset:
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
         # inputs['targets'] = torch.tensor(self.target[item], dtype=torch.long)
         _, targets = transformation(self.target[item])
-        inputs['targets'] = torch.tensor(targets, dtype=torch.float).view(1,-1)
+        # inputs['targets'] = torch.tensor(targets, dtype=torch.float).view(1,-1)
+        inputs['targets'] = torch.tensor(targets, dtype=torch.float)
         
         return inputs
         
