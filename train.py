@@ -27,12 +27,14 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
         max_len=max_len,
         transformer=transformer
     )
+    print('--------- 3 --------------')
 
     train_data_loader = torch.utils.data.DataLoader(
         dataset=train_dataset, 
         batch_size=batch_size, 
         num_workers = config.TRAIN_WORKERS
     )
+    print('--------- 4 --------------')
     
     val_dataset = dataset.TransformerDataset(
         text=df_val[config.COLUMN_TEXT].values,
@@ -40,6 +42,7 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
         max_len=max_len,
         transformer=transformer
     )
+    print('--------- 5 --------------')
 
     val_data_loader = torch.utils.data.DataLoader(
         dataset=val_dataset, 
@@ -50,7 +53,10 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
     #COMMENT: I may make the number_of_classes simpler
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = TransforomerModel(transformer, drop_out, number_of_classes=config.UNITS[task]) 
-    model.to(device)
+    # model.to(device)
+    model.to('cpu')
+    
+    print('--------- 6 --------------')
     
     #NOTE: I must check appropriate no_decay for LLaMA
     #NOTE: differte learning rates for LLaMA and classifier
@@ -69,6 +75,8 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
     
     # training and evaluation loop
     for epoch in range(1, epochs+1):
+        
+        print('--------- 7* --------------')
         
         pred_train, _ , loss_train = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
         save_preds(pred_train, df_train, task, training_data, 'training', epoch, transformer)
@@ -151,23 +159,26 @@ if __name__ == "__main__":
         ]
     )
     
+    print('--------- 1 --------------')
+    
     for task in tqdm(config.LABELS, desc='TRAIN', position=0):
-        df_train = df_train[(df_train['NO_value']<=0.5) | (task == 'task1')]
-        df_val = df_val[(df_val['NO_value']<=0.5) | (task == 'task1')]
+        for transfomer in config.TRANSFORMERS:
         
-        tqdm.write(f'\nTask: {task} Data: {args.training_data} Transfomer: {config.TRANSFORMERS.split("/")[-1]} Max_len: {config.MAX_LEN} Batch_size: {config.BATCH_SIZE} Dropout: {config.DROPOUT} lr: {config.LR}')
+            tqdm.write(f'\nTask: {task} Data: {args.training_data} Transfomer: {transfomer.split("/")[-1]} Max_len: {config.MAX_LEN} Batch_size: {config.BATCH_SIZE} Dropout: {config.DROPOUT} lr: {config.LR}')
             
-        df_results = train(df_train,
-                            df_val,
-                            task,
-                            config.EPOCHS,
-                            config.TRANSFORMERS,
-                            config.MAX_LEN,
-                            config.BATCH_SIZE,
-                            config.LR,
-                            config.DROPOUT,
-                            df_results,
-                            args.training_data
-        )
+            print('--------- 2 --------------')
             
-        df_results.to_csv(config.LOGS_PATH + '/' + args.training_data + '_' + task + '.csv', index=False)
+            df_results = train(df_train,
+                                df_val,
+                                task,
+                                config.EPOCHS,
+                                transfomer,
+                                config.MAX_LEN,
+                                config.BATCH_SIZE,
+                                config.LR,
+                                config.DROPOUT,
+                                df_results,
+                                args.training_data
+            )
+                
+            df_results.to_csv(config.LOGS_PATH + '/' + args.training_data + '_' + task + '.csv', index=False)

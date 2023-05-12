@@ -1,0 +1,24 @@
+TODO
+
+- Check the datasets [X]
+- task 2 & 3 well see the who dataset [X]
+- improve pred task 2 and 3 - task 1 NO == 1 [X]
+   - remove these sample to no confuse tge LLM during fine-tune
+- Normalize output layers task 2 input/output [X]
+
+- add NO to the output save file
+
+- clean the all training scripts
+
+- write the test script
+  - take into account NO == 1 task1 for the other tasks
+  - join NO value the final predictions [X]
+
+- range of the metric (documentation)
+
+- preper script to run in 2 gpu
+
+Giulia
+script
+- agregate predictions - diferente LLM
+- aproximate preds to possible values

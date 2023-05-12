@@ -2,13 +2,14 @@ import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
 from utils import transformation
+import config
 
 class TransformerDataset:
     def __init__(self, text, target, max_len, transformer):
         self.text = text
         self.target = target
         self.max_len = max_len
-        self.tokenizer = AutoTokenizer.from_pretrained(transformer)
+        self.tokenizer = AutoTokenizer.from_pretrained(config.REPO_PATH + '/' + transformer)
         # if self.tokenizer.pad_token is None:
         #     self.tokenizer.pad_token = self.tokenizer.eos_token
         
@@ -17,8 +18,6 @@ class TransformerDataset:
 
     def __getitem__(self, item):
         text = self.text[item]
-        # text = str(self.text[item])
-        # text = " ".join(text.split())
 
         inputs = self.tokenizer.encode_plus(
             text,
@@ -29,15 +28,21 @@ class TransformerDataset:
             truncation=True
         )
         
+        # task2/task3 Split labels NO from the others
+        _, targets, no_value = transformation(self.target[item])
+        
+        # task2 -> Normalize targets between 0 and 1
+        # task3 -> Normalize each target value between 0 and 1 
+        if len(targets) != config.UNITS['task1']:
+            targets = targets_normalization(targets, no_value)
+        
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
-        # inputs['targets'] = torch.tensor(self.target[item], dtype=torch.long)
-        _, targets = transformation(self.target[item])
-        # inputs['targets'] = torch.tensor(targets, dtype=torch.float).view(1,-1)
         inputs['targets'] = torch.tensor(targets, dtype=torch.float)
+        inputs['no_value'] = torch.tensor(no_value, dtype=torch.float)
         
         return inputs
-        
     
+
 class TransformerDataset_Test:
     def __init__(self, text, max_len, transformer):
         self.text = text
@@ -51,8 +56,6 @@ class TransformerDataset_Test:
 
     def __getitem__(self, item):
         text = self.text[item]
-        # text = str(self.text[item])
-        # text = " ".join(text.split())
 
         inputs = self.tokenizer.encode_plus(
             text,
@@ -66,3 +69,12 @@ class TransformerDataset_Test:
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
         
         return inputs
+    
+#### NEW FUNCTION #####
+def targets_normalization(targets, no_value):
+    if len(targets) == config.UNITS['task2']:
+        normalized_list = [t/sum(targets) if sum(targets) != 0 else 0 for t in targets]
+    else:
+        normalized_list = [t/(1-no_value[0]) if sum(targets) != 0 else 0 for t in targets]
+    
+    return normalized_list

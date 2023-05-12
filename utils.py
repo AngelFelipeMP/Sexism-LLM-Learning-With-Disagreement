@@ -95,15 +95,18 @@ def transformation(item):
     if len(eval(item)) == 2:
         classes = [i[0] for i in sorted(eval(item).items())]
         values = [i[1] for i in sorted(eval(item).items())]
+        no_value = [i[1] for i in sorted(eval(item).items()) if i[0] == 'NO']
     else:
         classes = [i[0] for i in sorted(eval(item).items()) if i[0] != 'NO']
         values = [i[1] for i in sorted(eval(item).items()) if i[0] != 'NO']
-    return classes, values
+        no_value = [i[1] for i in sorted(eval(item).items()) if i[0] == 'NO']
+        
+    return classes, values, no_value
 
 
 def save_preds(preds, df, task, data_train, data_val, epoch, transformer):
     index_label = [(index, eval(labels)) for index, labels in zip(df['id_EXIST'], df['soft_label_' + task])]
-    classes, _ = transformation(str(index_label[0][1]))
+    classes, _, _ = transformation(str(index_label[0][1]))
     json_pred = {item[0]:{"soft_label":{}} for item in index_label}
 
     for i in range(len(index_label)):
