@@ -104,20 +104,18 @@ def transformation(item):
     return classes, values, no_value
 
 
-def save_preds(preds, df, task, data_train, data_val, epoch, transformer):
-    index_label = [(index, eval(labels)) for index, labels in zip(df['id_EXIST'], df['soft_label_' + task])]
-    classes, _, _ = transformation(str(index_label[0][1]))
-    json_pred = {item[0]:{"soft_label":{}} for item in index_label}
-
-    for i in range(len(index_label)):
-        # for task 1
-        if 'NO' not in index_label[0][1].keys():
-            # add 'NO' value to json
-            json_pred[index_label[i][0]]["soft_label"]['NO'] = index_label[i][1]['NO']
-        # add other classes values to json
-        for j, c in enumerate(classes):
-            json_pred[index_label[i][0]]["soft_label"][c] = preds[i][j]
-            
+def save_preds(no_values, preds, df, task, data_train, data_val, epoch, transformer):
+    dev_path = config.DATA_PATH + '/' + config.DATA + '_' + 'dev.csv'
+    classes, _, _ = transformation(pd.read_csv(dev_path, index_col=None).at[0,'soft_label_' + task])
+    json_pred = {item:{"soft_label":{}} for item in df['id_EXIST'].tolist()}
+    
+    for index, pred, no_value in zip(df['id_EXIST'], preds, no_values):
+        for p,c in zip(pred, classes):
+            json_pred[index]["soft_label"][c] = p
+        
+        if task != 'task1':
+            json_pred[index]["soft_label"]['NO'] = no_value
+    
     # Save the dictionary as a JSON file
     path = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
     with open(path, "w") as f:
@@ -137,7 +135,28 @@ def eval_preds(task, data_train, data_val, epoch, transformer):
     return result_icm_soft_soft 
     
 
+# def save_preds(preds, df, task, data_train, data_val, epoch, transformer):
+#     index_label = [(index, eval(labels)) for index, labels in zip(df['id_EXIST'], df['soft_label_' + task])]
+#     classes, _, _ = transformation(str(index_label[0][1]))
+#     json_pred = {item[0]:{"soft_label":{}} for item in index_label}
 
+#     for i in range(len(index_label)):
+#         # for task 1
+#         print('##########################')
+#         print(index_label)
+#         if 'NO' not in index_label[0][1].keys():
+#             print('@@@@@@@@@@@@@@@@@@@@@@@@@')
+#             # add 'NO' value to json
+#             json_pred[index_label[i][0]]["soft_label"]['NO'] = index_label[i][1]['NO']
+#             print(json_pred)
+#         # add other classes values to json
+#         for j, c in enumerate(classes):
+#             json_pred[index_label[i][0]]["soft_label"][c] = preds[i][j]
+            
+#     # Save the dictionary as a JSON file
+#     path = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
+#     with open(path, "w") as f:
+#         json.dump(json_pred, f, indent=2)
 
 #######################
 ### below old funcs ###

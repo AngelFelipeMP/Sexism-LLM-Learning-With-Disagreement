@@ -12,6 +12,7 @@ def train_fn(data_loader, model, optimizer, device, scheduler):
     model.train()
     fin_targets = []
     fin_predictions = []
+    no_val_list = []
     total_loss = 0
     
     for batch in data_loader:
@@ -36,21 +37,23 @@ def train_fn(data_loader, model, optimizer, device, scheduler):
             # task2 -> Normalize targets between 0 and (1 - No value)
             # task3 -> Normalize each target value between 0 and (1 - No value)
             outputs, targets = normalize_outputs(outputs, targets, no_value)
-                
+
         fin_targets.extend(targets.cpu().detach().numpy().tolist())
         fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
+        no_val_list.extend(no_value.view(-1).cpu().detach().numpy().tolist())
         
         loss.backward()
         optimizer.step()
         scheduler.step()
         
-    return fin_predictions, fin_targets, total_loss/len(data_loader)
+    return no_val_list, fin_predictions, fin_targets, total_loss/len(data_loader)
 
 
 def eval_fn(data_loader, model, device):
     model.eval()
     fin_targets = []
     fin_predictions = []
+    no_val_list = []
     total_loss = 0
     
     with torch.no_grad():
@@ -78,8 +81,9 @@ def eval_fn(data_loader, model, device):
             
             fin_targets.extend(targets.cpu().detach().numpy().tolist())
             fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
+            no_val_list.extend(no_value.view(-1).cpu().detach().numpy().tolist())
     
-    return fin_predictions, fin_targets, total_loss/len(data_loader)
+    return no_val_list, fin_predictions, fin_targets, total_loss/len(data_loader)
 
 
 def test_fn(data_loader, model, device):

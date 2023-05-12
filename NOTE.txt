@@ -5,8 +5,7 @@ TODO
 - improve pred task 2 and 3 - task 1 NO == 1 [X]
    - remove these sample to no confuse tge LLM during fine-tune
 - Normalize output layers task 2 input/output [X]
-
-- add NO to the output save file
+- add NO to the output save file [X]
 
 - clean the all training scripts
 

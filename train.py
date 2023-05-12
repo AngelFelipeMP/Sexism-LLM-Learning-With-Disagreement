@@ -78,12 +78,12 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
         
         print('--------- 7* --------------')
         
-        pred_train, _ , loss_train = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
-        save_preds(pred_train, df_train, task, training_data, 'training', epoch, transformer)
+        no_train, pred_train, _ , loss_train = engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
+        save_preds(no_train, pred_train, df_train, task, training_data, 'training', epoch, transformer)
         icm_soft_train = eval_preds(task, training_data, 'training', epoch, transformer)
         
-        pred_val, _ , loss_val = engine.eval_fn(val_data_loader, model, device)
-        save_preds(pred_val, df_val, task, training_data, 'dev', epoch, transformer)
+        no_val, pred_val, _ , loss_val = engine.eval_fn(val_data_loader, model, device)
+        save_preds(no_val, pred_val, df_val, task, training_data, 'dev', epoch, transformer)
         icm_soft_val = eval_preds(task, training_data, 'dev', epoch, transformer)
         
         df_new_results = pd.DataFrame({'task':task,
