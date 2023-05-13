@@ -48,9 +48,10 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
     )
 
     #COMMENT: I may make the number_of_classes simpler
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if not config.DEVICE or config.DEVICE == 'max' else config.DEVICE
     model = TransforomerModel(transformer, drop_out, number_of_classes=config.UNITS[task]) 
+    if config.DEVICE == 'max':
+        model = torch.nn.DataParallel(model, device_ids=[i for i in range(torch.cuda.device_count())])
     model.to(device)
     
     #NOTE: I must check appropriate no_decay for LLaMA

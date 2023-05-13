@@ -42,7 +42,10 @@ def train_fn(data_loader, model, optimizer, device, scheduler):
         fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
         no_val_list.extend(no_value.view(-1).cpu().detach().numpy().tolist())
         
-        loss.backward()
+        if torch.cuda.device_count() > 1 and device != 'cpu' and config.DEVICE == 'max':
+            loss.mean().backward()
+        else:
+            loss.backward()
         optimizer.step()
         scheduler.step()
         
