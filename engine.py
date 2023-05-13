@@ -160,25 +160,6 @@ def normalize_outputs(outputs, targets, no_value):
         vec_list.append(vec_normalized)
     return vec_list[0], vec_list[1]
 
-# def normalize_outputs(outputs, no_value):
-#     if outputs.shape[1] == config.UNITS['task2']:
-#         outputs_normalized = (1 - no_value) * outputs / outputs.sum(dim=1)[:, None]
-#         outputs_normalized = torch.nan_to_num(outputs_normalized, nan=0.0)
-#     else:
-#         outputs_normalized = outputs * (1 - no_value)
-        
-#     return outputs_normalized
-
-
-# def normalization(targets, no_value, no_indices):
-#     if targets.shape[1] == config.UNITS['task2']:
-#         targets = nn.functional.normalize(targets, p=1, dim=1)
-#     else:
-#         no_value = torch.tensor([value for count, value in enumerate(no_value.numpy().tolist()) if count not in no_indices], dtype=torch.long)
-#         targets = targets / (1-no_value) 
-        
-#     return targets
-
 
 
 

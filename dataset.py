@@ -10,8 +10,6 @@ class TransformerDataset:
         self.target = target
         self.max_len = max_len
         self.tokenizer = AutoTokenizer.from_pretrained(config.REPO_PATH + '/' + transformer)
-        # if self.tokenizer.pad_token is None:
-        #     self.tokenizer.pad_token = self.tokenizer.eos_token
         
     def __len__(self):
         return len(self.text)
@@ -48,8 +46,6 @@ class TransformerDataset_Test:
         self.text = text
         self.max_len = max_len
         self.tokenizer = AutoTokenizer.from_pretrained(transformer)
-        # if self.tokenizer.pad_token is None:
-        #     self.tokenizer.pad_token = self.tokenizer.eos_token
         
     def __len__(self):
         return len(self.text)

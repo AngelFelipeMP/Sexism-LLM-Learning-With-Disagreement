@@ -6,16 +6,19 @@ TODO
    - remove these sample to no confuse tge LLM during fine-tune
 - Normalize output layers task 2 input/output [X]
 - add NO to the output save file [X]
+- range of the metric (documentation) [X]
+- clean the all training scripts [X]
 
-- clean the all training scripts
+- preper script to run in 2 gpu
+- get valeus for training MAX_LEN, BATCH_SIZE
 
 - write the test script
   - take into account NO == 1 task1 for the other tasks
   - join NO value the final predictions [X]
 
-- range of the metric (documentation)
 
-- preper script to run in 2 gpu
+
+
 
 Giulia
 script
