@@ -40,12 +40,13 @@ class TransformerDataset:
         
         return inputs
     
-
+    
 class TransformerDataset_Test:
-    def __init__(self, text, max_len, transformer):
+    def __init__(self, text, no_task1, max_len, transformer):
         self.text = text
+        self.no_task1 = no_task1
         self.max_len = max_len
-        self.tokenizer = AutoTokenizer.from_pretrained(transformer)
+        self.tokenizer = AutoTokenizer.from_pretrained(config.REPO_PATH + '/' + transformer)
         
     def __len__(self):
         return len(self.text)
@@ -63,6 +64,7 @@ class TransformerDataset_Test:
         )
         
         inputs = {k:torch.tensor(v, dtype=torch.long) for k,v in inputs.items()}
+        inputs['no_value'] = False if self.no_task1 is None else torch.tensor(self.no_task1[item], dtype=torch.float)
         
         return inputs
     

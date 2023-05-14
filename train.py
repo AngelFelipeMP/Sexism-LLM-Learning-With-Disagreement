@@ -12,7 +12,6 @@ from utils import save_preds, eval_preds
 from model import TransforomerModel
 import warnings
 warnings.filterwarnings('ignore')
-from sklearn import metrics
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 from transformers import logging

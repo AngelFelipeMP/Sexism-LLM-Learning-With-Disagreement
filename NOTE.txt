@@ -8,9 +8,14 @@ TODO
 - add NO to the output save file [X]
 - range of the metric (documentation) [X]
 - clean the all training scripts [X]
+- preper script to run in 2 gpugit [X]
+- get valeus for training MAX_LEN, BATCH_SIZE [X]
+- check infoXLM [X]
+      - I may download
+      - zip
+      - send to remove_non_sexist
+      - unzip
 
-- preper script to run in 2 gpu
-- get valeus for training MAX_LEN, BATCH_SIZE
 
 - write the test script
   - take into account NO == 1 task1 for the other tasks

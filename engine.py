@@ -89,55 +89,53 @@ def eval_fn(data_loader, model, device):
     return no_val_list, fin_predictions, fin_targets, total_loss/len(data_loader)
 
 
+
 def test_fn(data_loader, model, device):
     model.eval()
     fin_predictions = []
-
-    with torch.no_grad():
-        for batch in data_loader:
-            
-            # batch = {k:v.to(device, dtype=torch.long) for k,v in batch.items()}
-            batch = {k:v.to(device) for k,v in batch.items()}
-            outputs = model(batch)
-            
-            fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
-    
-    return fin_predictions
-
-
-#NOTE: I may remove "predict_fn"
-def predict_fn(data_loader, model, device):
-    model.eval()
-    fin_targets = []
-    fin_predictions = []
+    no_val_list = []
     
     with torch.no_grad():
         for batch in data_loader:
+            no_value = batch["no_value"].view(-1,1)
+            del batch["no_value"]
             
-            # batch = {k:v.to(device, dtype=torch.long) for k,v in batch.items()}
+            if no_value.any():
+                # remove non-sexist tweets input/targets/preds
+                batch, _, no_indices = remove_non_sexist(None, no_value, batch)
+                
             batch = {k:v.to(device) for k,v in batch.items()}
-            targets = batch["targets"]
-            del batch["targets"]
-
             outputs = model(batch)
             
-            fin_targets.extend(targets.cpu().detach().numpy().tolist())
+            if no_value.any():
+                # add non-sexist tweet targets/preds
+                outputs, _ = no_sexist_pred(outputs, None, no_indices, no_value)
+                # task2 -> Normalize targets between 0 and (1 - No value)
+                # task3 -> Normalize each target value between 0 and (1 - No value)
+                outputs, _ = normalize_outputs(outputs, None, no_value)
+            
             fin_predictions.extend(outputs.cpu().detach().numpy().tolist())
+            no_val_list.extend(no_value.view(-1).cpu().detach().numpy().tolist())
     
-    return fin_predictions, fin_targets
+    return no_val_list, fin_predictions
 
 #### NEW FUNCS ####
 def remove_non_sexist(targets, no_value, batch):
     no_indices, _ = torch.where(no_value > 0.84)
     for k,v in batch.items():
         batch[k] = torch.tensor([value for count, value in enumerate(v.numpy().tolist()) if count not in no_indices], dtype=torch.long)
-    targets = torch.tensor([t for count, t in enumerate(targets.numpy().tolist()) if count not in no_indices], dtype=torch.float)
+    if targets != None:
+        targets = torch.tensor([t for count, t in enumerate(targets.numpy().tolist()) if count not in no_indices], dtype=torch.float)
+    
     return batch, targets, no_indices
-
 
 def no_sexist_pred(outputs, targets, no_indices, no_value):
     vec_list = []
     for vec in [outputs, targets]:
+        if vec == None:
+            vec_list.append(None)
+            break
+        
         new_vec = []
         vec = vec.cpu().detach().numpy().tolist()
         i=0
@@ -154,6 +152,10 @@ def no_sexist_pred(outputs, targets, no_indices, no_value):
 def normalize_outputs(outputs, targets, no_value):
     vec_list = []
     for vec in [outputs, targets]:
+        if vec == None:
+            vec_list.append(None)
+            break
+        
         if vec.shape[1] == config.UNITS['task2']:
             vec_normalized = (1 - no_value) * vec / vec.sum(dim=1)[:, None]
             vec_normalized = torch.nan_to_num(vec_normalized, nan=0.0)
