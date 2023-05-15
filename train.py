@@ -100,10 +100,12 @@ def train(df_train, df_val, task, epochs, transformer, max_len, batch_size, lr, 
         # save models weights
         path_model_save = config.LOGS_PATH + '/model' + '_' + task + '_' + training_data + '_' + transformer.split("/")[-1] + '.pt'
         if training_data == 'training-dev' and  epoch == epochs:
-            torch.save(model.state_dict(), path_model_save)
+            # torch.save(model.state_dict(), path_model_save)
+            torch.save(model, path_model_save)
         else:
             if epoch == 1 or icm_soft_val > df_results['icm_soft_val'][:-1].max():
-                torch.save(model.state_dict(), path_model_save)
+                # torch.save(model.state_dict(), path_model_save)
+                torch.save(model, path_model_save)
 
     return df_results
 

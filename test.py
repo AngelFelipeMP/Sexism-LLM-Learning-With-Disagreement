@@ -30,11 +30,14 @@ def test(df_test, task, transformer, max_len, batch_size, drop_out):
         num_workers = config.TRAIN_WORKERS
     )
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if not config.DEVICE or config.DEVICE == 'max' else config.DEVICE
-    model = TransforomerModel(transformer, drop_out, number_of_classes=config.UNITS[task])
-    model.load_state_dict(torch.load(config.LOGS_PATH + '/model_' + task + '_training-dev_' + transfomer + '.pt'))
-    if config.DEVICE == 'max':
-        model = torch.nn.DataParallel(model, device_ids=[i for i in range(torch.cuda.device_count())])
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if not config.DEVICE or config.DEVICE == 'max' else config.DEVICE
+    # model = TransforomerModel(transformer, drop_out, number_of_classes=config.UNITS[task])
+    # model.load_state_dict(torch.load(config.LOGS_PATH + '/model_' + task + '_training-dev_' + transfomer + '.pt'))
+    # model = torch.load(config.LOGS_PATH + '/model_' + task + '_training-dev_' + transfomer + '.pt')
+    # if config.DEVICE == 'max':
+    #     model = torch.nn.DataParallel(model, device_ids=[i for i in range(torch.cuda.device_count())])
+    device = 'cuda:0'
+    model = torch.load(config.LOGS_PATH + '/model_' + task + '_training-dev_' + transfomer + '.pt')
     model.to(device)
     
     # prediction
