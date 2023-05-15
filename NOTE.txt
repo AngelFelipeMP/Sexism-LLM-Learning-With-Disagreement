@@ -15,14 +15,14 @@ TODO
       - zip
       - send to remove_non_sexist
       - unzip
-
-
-- write the test script
+- write the test script [X]
   - take into account NO == 1 task1 for the other tasks
   - join NO value the final predictions [X]
 
 
-
+ - fix small problems regards to
+       - save mode in dict
+       - load model and predict using two gpus
 
 
 Giulia
