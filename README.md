@@ -17,7 +17,7 @@ If you find this article [article](https://arxiv.org/pdf/2307.03385.pdf) or the 
 ```
 @inproceedings{depaula2023exist, 
 title={AI-UPV at EXIST 2023 -- Sexism Characterization Using Large Language Models Under The Learning with Disagreements Regime}, 
-author={de Paula, Angel Felipe Magnossão and Rizzi, Giulia and Fersini, Elisabetta and Spina, Damiano}, 
+author={Magnoss{\~a}o de Paula, Angel Felipe and Rizzi, Giulia and Fersini, Elisabetta and Spina, Damiano}, 
 booktitle={Proceedings of the Working Notes of CLEF 2023 - Conference and Labs of the Evaluation Forum}, 
 year={2023},
 address={Thessaloniki, Greece}
