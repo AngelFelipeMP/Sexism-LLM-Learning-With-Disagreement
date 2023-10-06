@@ -18,11 +18,17 @@ TODO
 - write the test script [X]
   - take into account NO == 1 task1 for the other tasks
   - join NO value the final predictions [X]
-
-
- - fix small problems regards to
+ - fix small problems regards to [????]
        - save mode in dict
        - load model and predict using two gpus
+
+- Check how to submit the runs
+- Script to create hard-labels 
+- Script to create Emsemble (simple average)
+      - reseive soft-labels 
+      - retrive soft-labels
+
+
 
 
 Giulia

@@ -114,7 +114,7 @@ def save_preds(no_values, preds, df, task, data_train, data_val, epoch, transfor
             json_pred[index]["soft_label"][c] = p
         
         if task != 'task1':
-            json_pred[index]["soft_label"]['NO'] = no_value
+            json_pred[index]["soft_label"]['NO'] = 1.0 if no_value > 0.84 else no_value
     
     # Save the dictionary as a JSON file
     path = config.LOGS_PATH + '/' + task + '_' + data_train + '_' + data_val + '_' + str(epoch) + '_' + transformer + '.json'
