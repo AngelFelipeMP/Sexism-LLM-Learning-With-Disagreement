@@ -20,8 +20,8 @@ if __name__ == "__main__":
         ax.plot()
         plt.show()
 
-        print('Porcentage of comments under 64 tokens: ',((df.query('number_tokens < 64').size / df.size) * 100))
-        print('Porcentage of comments under 96 tokens: ',((df.query('number_tokens < 96').size / df.size) * 100))
-        print('Porcentage of comments under 128 tokens: ',((df.query('number_tokens < 128').size / df.size) * 100))
-        print('Porcentage of comments under 256 tokens: ',((df.query('number_tokens < 256').size / df.size) * 100))
-        print('Porcentage of comments under 512 tokens: ',((df.query('number_tokens < 512').size / df.size) * 100))
+        print('Percentage of comments under 64 tokens: ',((df.query('number_tokens < 64').size / df.size) * 100))
+        print('Percentage of comments under 96 tokens: ',((df.query('number_tokens < 96').size / df.size) * 100))
+        print('Percentage of comments under 128 tokens: ',((df.query('number_tokens < 128').size / df.size) * 100))
+        print('Percentage of comments under 256 tokens: ',((df.query('number_tokens < 256').size / df.size) * 100))
+        print('Percentage of comments under 512 tokens: ',((df.query('number_tokens < 512').size / df.size) * 100))
