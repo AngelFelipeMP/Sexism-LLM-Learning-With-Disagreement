@@ -8,6 +8,7 @@ parser.add_argument("--merge_data_labels", default=False, help="Must be True or 
 parser.add_argument("--test_to_csv", default=False, help="Must be True or False", action='store_true')
 parser.add_argument("--merge_training_dev", default=False, help="Must be True or False", action='store_true')
 parser.add_argument("--merge_gold_soft_label", default=False, help="Must be True or False", action='store_true')
+parser.add_argument("--merge_roundtrip_translations", default=False, help="Must be True or False", action='store_true')
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -39,3 +40,10 @@ if __name__ == "__main__":
         merge_gold_soft_label(
             config.LABEL_GOLD_PATH, 
             config.DATA)
+        
+    if args.merge_roundtrip_translations:
+        merge_roundtrip_translations(config.DATA_PATH, 
+                                     config.TRANSLATION_PATH, 
+                                     config.PACKAGE_PATH,
+                                     config.LABEL_GOLD_PATH,
+                                     config.TRANSLATION_ROUNDTRIPS)
