@@ -224,7 +224,7 @@ def merge_roundtrip_translations(data_path, translation_path, package_path, gold
     
      
     #Create dev CSV using the different translations
-    partition = "dev"
+    dataset = "dev"
 
     #read trainin data in JSON format
     path = package_path + '/' + dataset + '/EXIST2023_' + dataset + '.json'
