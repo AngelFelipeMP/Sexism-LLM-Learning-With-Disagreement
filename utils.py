@@ -181,11 +181,11 @@ def merge_roundtrip_translations(data_path, translation_path, package_path, gold
     merged_2['id_EXIST'] = ids_2
     merged_2['tweet'] = translations['2']
     
-    pd.set_option('display.max_columns', None)
+    #pd.set_option('display.max_columns', None)
 
-    print(merged[['id_EXIST','tweet']].head())
-    print(merged_1[['id_EXIST','tweet']].head())
-    print(merged_2[['id_EXIST','tweet']].head())
+    #print(merged[['id_EXIST','tweet']].head())
+    #print(merged_1[['id_EXIST','tweet']].head())
+    #print(merged_2[['id_EXIST','tweet']].head())
 
     #write: M0, M1, M2, M0_M1, M0_M1, M0_M1_M2
     
