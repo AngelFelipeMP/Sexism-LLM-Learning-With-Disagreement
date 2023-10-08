@@ -90,6 +90,9 @@ def merge_gold_soft_label(label_gold_path, dataset):
             json.dump(json_list[0], merged_file, indent=2)
 
 
+    
+
+
 def transformation(item):
     # dict to list ordered by keys
     if len(eval(item)) == 2:
@@ -129,7 +132,113 @@ def eval_preds(task, data_train, data_val, epoch, transformer):
         path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_val + '_' + task + '_gold_soft.json'
     else:
         path_gold_file = config.LABEL_GOLD_PATH + '/' + 'EXIST2023_' + data_train + '_' + task + '_gold_soft.json'
-        
+         
     result_icm_soft_soft = main(['-p', path_json_results, '-g', path_gold_file, '-t', task])
     
     return result_icm_soft_soft 
+
+
+
+def merge_roundtrip_translations(data_path, translation_path, package_path, gold_path, num_translation_roundtrips):
+    
+    dataset = "training"
+    #read trainin data in JSON format
+    path = package_path + '/' + dataset + '/EXIST2023_' + dataset + '.json'
+    df_partition = pd.read_json(path, orient='index')
+   
+    #read goldstandard    
+    golds = pd.DataFrame()
+    for task in  config.UNITS.keys():
+      
+      goldfile = gold_path + '/EXIST2023_' + dataset + '_' + task + '_gold_soft.json' 
+      
+
+      gold_partition = pd.read_json(goldfile, orient='index')
+      column = "soft_labels_{}".format(task)
+      
+      golds[column] = gold_partition
+      
+    golds["id_EXIST"] = golds.index
+
+    merged = df_partition.merge(golds, on="id_EXIST")
+    
+    #read translations:
+    translations = pd.DataFrame()
+    for i in range(0, num_translation_roundtrips+1):
+        translation = pd.read_csv(translation_path + '/EXIST2023_' + dataset + '.txt.' + str(i), sep='\t', header=None)  
+        translations[str(i)] = translation
+
+    ids = merged['id_EXIST'].tolist()
+
+    #generate new IDs for the translations
+    ids_1 = merged['id_EXIST'].apply(lambda x: str(x) + '_1')
+    merged_1 = merged.copy()
+    merged_1['id_EXIST'] = ids_1
+    merged_1['tweet'] = translations['1']
+
+    ids_2 = merged['id_EXIST'].apply(lambda x: str(x) + '_2')
+    merged_2 = merged.copy()
+    merged_2['id_EXIST'] = ids_2
+    merged_2['tweet'] = translations['2']
+    
+    pd.set_option('display.max_columns', None)
+
+    print(merged[['id_EXIST','tweet']].head())
+    print(merged_1[['id_EXIST','tweet']].head())
+    print(merged_2[['id_EXIST','tweet']].head())
+
+    #write: M0, M1, M2, M0_M1, M0_M1, M0_M1_M2
+    
+    #id_EXIST, lang,	tweet,	number_annotators,	<
+    # annotators,	gender_annotators,	age_annotators,	
+    # labels_task1,	labels_task2,	labels_task3,	split,	
+    # soft_label_task1,	soft_label_task2,	soft_label_task3
+
+    #M0
+    path_csv = data_path + '/' + 'EXIST2023_' + dataset
+
+    m0 = merged
+    m0_path = path_csv + '_M0.csv'
+    m0.to_csv(m0_path, index=False)
+
+    m1 =merged_1
+    m1_path = path_csv + '_M1.csv'
+    m1.to_csv(m1_path, index=False)
+
+    m2 = merged_2
+    m2_path = path_csv + '_M2.csv'
+    m2.to_csv(m2_path, index=False)
+
+    m0_m1 = pd.concat([m0,m1], ignore_index=True)
+    m0_m1_path = path_csv + '_M0_M1.csv'
+    m0_m1.to_csv(m0_m1_path, index=False)
+
+    m0_m2 = pd.concat([m0,m2], ignore_index=True)
+    m0_m2_path = path_csv + '_M0_M2.csv'
+    m0_m2.to_csv(m0_m2_path, index=False)
+    
+    m0_m1_m2 = pd.concat([m0,m1,m2], ignore_index=True)
+    
+    m0_m1_m2_path = path_csv + '_M0_M1_M2.csv'
+    m0_m1_m2.to_csv(m0_m1_m2_path, index=False)
+    
+     
+    #Create dev CSV using the different translations
+    partition = "dev"
+
+    #read trainin data in JSON format
+    path = package_path + '/' + dataset + '/EXIST2023_' + dataset + '.json'
+    df_partition = pd.read_json(path, orient='index')
+
+    path_csv = data_path + '/' + 'EXIST2023_' + dataset
+    #create versions with different translations:
+    #M0
+    df_partition.to_csv(path_csv + '_M0.csv', index=False)
+    #M1
+    df_partition['tweet'] = translations['1']
+    df_partition.to_csv(path_csv + '_M1.csv', index=False)
+    #M2
+    df_partition['tweet'] = translations['2']
+    df_partition.to_csv(path_csv + '_M2.csv', index=False)
+   
+    
