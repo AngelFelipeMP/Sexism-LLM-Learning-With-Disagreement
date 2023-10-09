@@ -226,19 +226,31 @@ def merge_roundtrip_translations(data_path, translation_path, package_path, gold
     #Create dev CSV using the different translations
     dataset = "dev"
 
-    #read trainin data in JSON format
+    #read dev data in JSON format
     path = package_path + '/' + dataset + '/EXIST2023_' + dataset + '.json'
     df_partition = pd.read_json(path, orient='index')
+    
+    #Read translations for dev:
+    translations_dev = pd.DataFrame()
+    for i in range(0, num_translation_roundtrips+1):
+        translation = pd.read_csv(translation_path + '/EXIST2023_' + dataset + '.txt.' + str(i), sep='\t', header=None)  
+        translations_dev[str(i)] = translation
 
+    print(translations_dev.head())
+    print(translations_dev.shape)
+    print(df_partition.shape)
     path_csv = data_path + '/' + 'EXIST2023_' + dataset
     #create versions with different translations:
     #M0
-    df_partition.to_csv(path_csv + '_M0.csv', index=False)
+    m0_dev = df_partition.copy()
+    m0_dev.to_csv(path_csv + '_M0.csv', index=False)
     #M1
-    df_partition['tweet'] = translations['1']
-    df_partition.to_csv(path_csv + '_M1.csv', index=False)
+    m1_dev = df_partition.copy()
+    m1_dev['tweet'] = translations_dev['1'].tolist()
+    m1_dev.to_csv(path_csv + '_M1.csv', index=False)
     #M2
-    df_partition['tweet'] = translations['2']
-    df_partition.to_csv(path_csv + '_M2.csv', index=False)
-   
+    m2_dev = df_partition.copy()
+    m2_dev['tweet'] = translations_dev['2'].tolist()
+    m2_dev.to_csv(path_csv + '_M2.csv', index=False)
+    
     
