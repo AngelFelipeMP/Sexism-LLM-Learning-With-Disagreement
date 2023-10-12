@@ -12,11 +12,14 @@ SEED = 17
 CODE_PATH = os.getcwd()
 REPO_PATH = '/'.join(CODE_PATH.split('/')[0:-1])
 DATA_PATH = REPO_PATH + '/' + 'data'
-PACKAGE_PATH = REPO_PATH + '/' + 'package'
+PACKAGE_PATH = REPO_PATH + '/' + 'EXIST_2023_Dataset'
 DATA_DEV_PATH = PACKAGE_PATH + '/' + 'dev/EXIST2023_dev' + '.json'
 DATA_TRAIN_PATH = PACKAGE_PATH + '/' + 'training/EXIST2023_training' + '.json'
 DATA_TEST_PATH = PACKAGE_PATH + '/' + 'test/EXIST2023_test_clean' + '.json'
 LABEL_GOLD_PATH = PACKAGE_PATH + '/' + 'evaluation/golds'
+
+TRANSLATION_PATH = REPO_PATH + '/' + 'translations'
+TRANSLATION_ROUNDTRIPS = 2
 
 DATA = 'EXIST2023'
 DATA_URL = 'URL_SHARED_BY_ORGANIZERS_TO_DOWNLOAD_EXIST_2023_DATA'
@@ -32,7 +35,7 @@ DATASET_DEV = 'EXIST2023_dev.csv'
 DATASET_TEST = 'EXIST2023_test.csv'
 DATASET_TRAIN_DEV = 'EXIST2023_training-dev.csv'
 
-DEVICE = 'max' # None 'max' 'cpu' 'cuda:0' 'cuda:1'
+DEVICE = 'mps' # 'max' # None 'max' 'cpu' 'cuda:0' 'cuda:1' 'mps'
 TRAIN_WORKERS = 10
 VAL_WORKERS = 10
 LOGS_PATH = REPO_PATH + '/' + 'logs'

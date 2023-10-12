@@ -971,6 +971,7 @@ def check_file_exist(path_file):
         
 if __name__ == '__main__':  
     args = sys.argv[1:]
-    _ = main(args) ##### ANGEL ADD ####
+    score = main(args) ##### ANGEL ADD ####
+    print(score)
     
 

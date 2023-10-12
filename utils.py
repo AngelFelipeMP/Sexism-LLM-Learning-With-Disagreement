@@ -253,4 +253,3 @@ def merge_roundtrip_translations(data_path, translation_path, package_path, gold
     m2_dev['tweet'] = translations_dev['2'].tolist()
     m2_dev.to_csv(path_csv + '_M2.csv', index=False)
     
-    
